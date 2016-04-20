@@ -2,10 +2,12 @@
  *Assignment 5
  *COP 4600
  *Team Members: Deni Karuli, Justin Gentry, Miles Friedman
+ *Group #23
  *File Name: char-device.c
  *Due Date: April 25th, 2016
  *Citations:
  *	1-http://derekmolloy.ie/writing-a-linux-kernel-module-part-2-a-character-device/
+ *	2-http://www.tldp.org/LDP/lkmpg/2.6/html/index.html
 */
 
 //Required Libraries
@@ -99,7 +101,7 @@ static void __exit chardevice_exit(void){
 //Define functions open, read, write, release
 static int dev_open(struct inode *inodep, struct file *filep){
  access_counter++;
- printk(KERN_INFO "DEVICE ACCESS COUNTER: %d\n", access_counter);
+ printk(KERN_INFO "DEVICE OPENED! ACCESS COUNTER: %d\n", access_counter);
  return 0;
 }
 
@@ -126,7 +128,7 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
 }
 
 static int dev_release(struct inode *inodep, struct file *filep){
-printk(KERN_INFO "DEVICE SUCCESSFULLY TERMINATED\n");
+printk(KERN_INFO "DEVICE SUCCESSFULLY TERMINATED!\n");
 return 0;
 }
 
