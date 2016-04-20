@@ -21,6 +21,7 @@
 //Declaring Globals
 #define DEVICE_N "char-device"
 #define CLASS_N  "char"
+#define BUFFERMAX 1000
 
 //Defining License
 MODULE_LICENSE("GPL");
@@ -30,7 +31,7 @@ MODULE_VERSION("1.0");
 
 //Common variables
 static int    major_number;
-static char   response[1000] = {0};
+static char   response[BUFFERMAX] = {0};
 static short  response_size;
 static int    access_counter = 0;
 static struct class* char_Class = NULL;
