@@ -23,7 +23,8 @@
 //Defining License
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Deni Karuli, Justin Gentry, Miles Friedman");
-MODULE_DISCRIPTION("Assignment 5");
+MODULE_DESCRIPTION("Assignment 5 COP4600");
+MODULE_VERSION("1.0");
 
 //Common variables
 static int    major_number;
@@ -52,7 +53,7 @@ static int __init chardevice_init(void){
  printk(KERN_INFO "Device driver starting initialization\n");
  
  //Create Unique Major Number for this session
- major_number = register_chardev(0, DEVICE_N, &fops);
+ major_number = register_chrdev(0, DEVICE_N, &fops);
   
  //Error Check for New Session
  if(major_number < 0){
@@ -66,7 +67,7 @@ static int __init chardevice_init(void){
  
  //Error Check Class Creation
  if(IS_ERR(char_Class)){
- unregister_chardev(major_number, DEVICE_N);
+ unregister_chrdev(major_number, DEVICE_N);
  printk(KERN_ALERT "FAILED TO CREATE CLASS\n");
  return PTR_ERR(char_Class);
  }
@@ -78,7 +79,7 @@ static int __init chardevice_init(void){
  //Error Check Driver Creation
  if(IS_ERR(char_Device)){
  class_destroy(char_Class);
- unregister_chardev(major_number, DEVICE_N);
+ unregister_chrdev(major_number, DEVICE_N);
  printk(KERN_ALERT "FAILED TO CREATE DRIVER\n");
  return PTR_ERR(char_Device);
  }
@@ -91,7 +92,7 @@ static void __exit chardevice_exit(void){
  device_destroy(char_Class, MKDEV(major_number, 0));
  class_unregister(char_Class);
  class_destroy(char_Class);
- unregister_chardev(major_number, DEVICE_N);
+ unregister_chrdev(major_number, DEVICE_N);
  printk(KERN_INFO "DEVICE DRIVER TERMINATED\n");
 }
 
