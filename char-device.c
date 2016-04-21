@@ -31,8 +31,8 @@ MODULE_VERSION("1.0");
 
 //Common variables
 static int    major_number;
-static char   response[BUFFERMAX] = {0};
-static short  response_size;
+static char   response[BUFFERMAX];
+static short  response_size=0;
 static int    access_counter = 0;
 static struct class* char_Class = NULL;
 static struct device* char_Device = NULL;
@@ -108,24 +108,70 @@ static int dev_open(struct inode *inodep, struct file *filep){
 
 static ssize_t dev_read(struct file *filep, char *buffer, size_t len, loff_t *offset){
  int errorCounter = 0;
+ int k;
+ if(response_size>len){
+ int new_size = (response_size - len);
+ errorCounter = copy_to_user(buffer, response, len);
+ //Success Message
+ if(errorCounter == 0){
+ printk(KERN_INFO "USER HAS OBTAINED %d CHARS FROM SYSTEM\n", len);
+ response_size = new_size;
+ for(k = 0; k<BUFFERMAX; k++)
+ {
+ if(k<(BUFFERMAX-len)){
+ response[k]=response[k+len];
+ }
+ else{
+ response[k]= '\0';
+ }
+ }
+ return 0;
+ }
+ //Error Message
+ else{
+ printk(KERN_INFO "USER HAS FAILED TO OBTAIN %d CHARS FROM SYSTEM\n", errorCounter);
+ return -EFAULT;
+ }
+ }
+ else{
  errorCounter = copy_to_user(buffer, response, response_size);
  //Success Message
  if(errorCounter == 0){
  printk(KERN_INFO "USER HAS OBTAINED %d CHARS FROM SYSTEM\n", response_size);
+ for(k = 0; k<BUFFERMAX; k++){
+ response[k]= '\0';
+ }
  return (response_size = 0);
  }
  //Error Message
  else{
  printk(KERN_INFO "USER HAS FAILED TO OBTAIN %d CHARS FROM SYSTEM\n", errorCounter);
  return -EFAULT;
+ }
  } 
 }
 
 static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, loff_t *offset){
- sprintf(response, "%s(%d letters)", buffer, len);
+ int i = 0;
+ if((response_size+len)>BUFFERMAX){
+ for(i = 0; i<(BUFFERMAX - response_size); i++){
+ response[i+(response_size)] = buffer[i];
+ }
+ printk(KERN_INFO "MAXIMUM BUFFER SIZE REACHED, ONLY %d BYTES STORED\n", i);
  response_size = strlen(response);
- printk(KERN_INFO "SYSTEM OBTAINED %d CHARS FROM USER\n", len);
- return len;
+ }
+ else{
+ if(strlen(response)<1){
+ sprintf(response, "%s", buffer);
+ }
+ else{
+ sprintf(response, "%s%s", response, buffer);
+ }
+ response_size = strlen(response);
+ printk(KERN_INFO "SYSTEM OBTAINED %d CHARS FROM USER, %d BYTES LEFT\n", len,(BUFFERMAX -response_size));
+ i = len;
+ }
+ return i;
 }
 
 static int dev_release(struct inode *inodep, struct file *filep){

@@ -18,7 +18,7 @@
 static char receive[BUFFER_LENGTH];     ///< The receive buffer from the LKM
 
 int main(){
-   int ret, fd;
+   int ret, fd, z;
    char stringToSend[BUFFER_LENGTH];
    printf("Starting device test code example...\n");
    fd = open("/dev/char-device", O_RDWR);             // Open the device with read/write access
@@ -26,25 +26,30 @@ int main(){
       perror("Failed to open the device...");
       return errno;
    }
+  
    printf("Type in a short string to send to the kernel module:\n");
    scanf("%[^\n]%*c", stringToSend);                // Read in a string (with spaces)
+   for(z=0;z<5;z++){
    printf("Writing message to the device [%s].\n", stringToSend);
    ret = write(fd, stringToSend, strlen(stringToSend)); // Send the string to the LKM
    if (ret < 0){
       perror("Failed to write the message to the device.");
       return errno;
    }
-
+   scanf("%[^\n]%*c", stringToSend);
+   }
    printf("Press ENTER to read back from the device...\n");
+   for(z=0;z<5;z++){
    getchar();
-
    printf("Reading from the device...\n");
-   ret = read(fd, receive, BUFFER_LENGTH);        // Read the response from the LKM
+   ret = read(fd, receive, 10);        // Read the response from the LKM
    if (ret < 0){
       perror("Failed to read the message from the device.");
       return errno;
    }
    printf("The received message is: [%s]\n", receive);
+   memset(receive,'\0',10);
+   }
    printf("End of the program\n");
    return 0;
 }
