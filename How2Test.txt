@@ -1,0 +1,17 @@
+1. create a folder in the main directory
+2. Place all assingment files inside
+3. open terminal and cd to that folder
+4. in terminal type -> make
+5. hit enter
+6. in terminal type -> sudo insmod char-device.ko
+7. hit enter
+8. in terminal type -> sudo ./test
+9. hit enter
+10. follow terminal instructions
+11. when your done with test file go to step 12.
+12. in terminal type -> dmesg
+13. hit enter
+14. in terminal type -> sudo rmmod char-device
+15. hit enter
+16. in terminal type -> dmesg
+17. Read it if you understand it and your done at this point :D
